@@ -5,7 +5,7 @@ import os
 import sys
 
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, when, count, sum as pyspark_sum
+from pyspark.sql.functions import col, count, sum as pyspark_sum, udf
 from pyspark.sql.types import StringType, StructField, StructType
 from pyspark.sql.window import Window
 
@@ -64,6 +64,24 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+
+def compute_day_part_UDF(time):
+    try:
+        t = int(time)
+    except(TypeError, ValueError):
+        return 'LateNight'
+    
+    if 500 <= t and t <= 1159:
+        return 'Morning'
+    elif 1200 <=t and t <= 1659:
+        return 'Afternoon'
+    elif 1700 <= t and t <= 2059:
+        return 'Night'
+    else:
+        return 'LateNight'
+
+
+
 def main() -> None:
     args = parse_args()
     la_crime_data_2010_19_path = build_path(args.data_path, 'LA_Crime_Data_2010_2019.csv')
@@ -72,7 +90,7 @@ def main() -> None:
     output_path = args.output
     
 
-    builder = SparkSession.builder.appName("DF query 1 execution")
+    builder = SparkSession.builder.appName("DF UDF query 1 execution")
     spark = builder.getOrCreate()
     spark.sparkContext.setLogLevel("ERROR")
 
@@ -85,14 +103,10 @@ def main() -> None:
 
     filtered_street_crimes__df = la_crime__df.filter(col("Premis Desc") == "STREET")
 
-    time = col("TIME OCC").cast("int")
-    day_part = (
-        when(time.between(500, 1159), 'Morning')
-        .when(time.between(1200, 1659), 'Afternoon')
-        .when(time.between(1700, 2059), 'Night')
-        .otherwise('LateNight')
+    day_part_udf = udf(compute_day_part_UDF, StringType())
+    crimes_with_daypart_df = filtered_street_crimes__df.withColumn(
+        'day_part', day_part_udf(col("TIME OCC"))
     )
-    crimes_with_daypart_df = filtered_street_crimes__df.withColumn('day_part', day_part)
 
     counts_df = crimes_with_daypart_df.groupBy("day_part").agg(count("*").alias("crime_count"))
 

@@ -5,7 +5,7 @@ import os
 import sys
 
 from pyspark.sql import SparkSession
-import csv, json
+import json
 
 from time import perf_counter
 
@@ -57,8 +57,9 @@ def main() -> None:
     la_census_block = (
         la_census_features
         .map(extract)
-        .filter(lambda row: row[0] is not None and row[1][0] > 0)
-        .reduceByKey(lambda row_a, row_b: (row_a[0]+row_a[0] , row_a[1]+row_a[1]))
+        .filter(lambda row: row[0] is not None)
+        .reduceByKey(lambda row_a, row_b: (row_a[0]+row_b[0] , row_a[1]+row_b[1]))
+        .filter(lambda row: row[1][0] > 0)
     )
 
 
@@ -67,27 +68,35 @@ def main() -> None:
         sc.textFile(la_income_path)
         .map(lambda line: line.split(";"))
         .filter(lambda row: row[0] != 'Zip Code')
-        .map(lambda row: (row[0], row[1], row[2].replace('$','').replace(',','')))
+        .map(lambda row: (row[0], float(row[2].replace('$','').replace(',','')) ) )
     )
 
 
-    joined_df = la_census_block.join(la_income)
+    joined_rdd = la_census_block.join(la_income)
+
+    #   After joining
+    #   row[0] is the key
+    #   row[1] is the values of joined rdds
+
+    #   row[1][0] is the values of rdd la_census_block 
+    #   row[1][0][0] is population and row[1][0][1] is housing
+    
+    #   row[1][1] is the values of rdd la_income (income)
+
 
     median_per_person_income = (
-        joined_df
-        .map(lambda row: (row[0], row[3]*row[1][1] / row[1][0] ))
+        joined_rdd
+        .map(lambda row: (row[0], row[1][1]*row[1][0][1] / row[1][0][0] ))
         .collect()
-    )
-
-    
+    )    
     end_time = perf_counter()
     print(f"Execution Time: {end_time-start_time}")
 
-    for day_part, percentage in median_per_person_income:
-        print( f"{day_part}: {percentage:.2f}%" ) 
+    for Zip_Code, per_person_income in median_per_person_income:
+        print( f"Zip Code {Zip_Code}: {per_person_income}$ per person Income" ) 
 
     if output_path:
-        result_df = spark.createDataFrame(median_per_person_income, ['day_part', 'percentage'])
+        result_df = spark.createDataFrame(median_per_person_income, ['Zip_Code', 'per_person_income'])
         result_df.coalesce(1).write.mode("overwrite").csv(output_path, header=True)
         print(f"Saved to: {output_path}")
 

@@ -89,6 +89,7 @@ def main() -> None:
             'Estimated_Median_Income',
             F.regexp_replace(F.col('Estimated_Median_Income'), '[$,]', '').cast('double')
         )
+        .filter(F.col('Estimated_Median_Income').isNotNull())
     )
 
 

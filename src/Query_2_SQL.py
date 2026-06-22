@@ -6,7 +6,6 @@ import sys
 
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StringType, StructField, StructType
-from pyspark.sql.window import Window
 
 from time import perf_counter
 

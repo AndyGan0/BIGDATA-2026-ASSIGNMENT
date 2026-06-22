@@ -68,7 +68,9 @@ def main() -> None:
         sc.textFile(la_income_path)
         .map(lambda line: line.split(";"))
         .filter(lambda row: row[0] != 'Zip Code')
-        .map(lambda row: (row[0], float(row[2].replace('$','').replace(',','')) ) )
+        .map(lambda row: (row[0], row[2].replace('$','').replace(',','').strip() ) )
+        .filter(lambda row: row[1].isdigit())
+        .map(lambda row: (row[0], float(row[1])))
     )
 
 

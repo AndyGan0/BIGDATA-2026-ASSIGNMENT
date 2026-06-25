@@ -1,0 +1,12 @@
+run 1: Execution Time: 26.082728470209986
+run 2: Execution Time: 35.280982189346105
+run 3: Execution Time: 53.354715764988214
+
+##########################################
+
+OUTPUT
+
+LateNight: 34.08%
+Night: 26.92%
+Afternoon: 21.23%
+Morning: 17.76%

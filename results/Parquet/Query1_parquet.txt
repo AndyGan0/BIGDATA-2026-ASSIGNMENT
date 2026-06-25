@@ -1,0 +1,3 @@
+run 1: Execution Time: 7.9203355787321925
+run 2: Execution Time: 8.605812383815646
+run 3: Execution Time: 8.206523687113076

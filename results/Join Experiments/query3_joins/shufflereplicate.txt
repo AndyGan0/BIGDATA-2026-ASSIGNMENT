@@ -1,0 +1,126 @@
+run 1: Execution Time: 36.1103604240343
+run 2: Execution Time: 31.83990245917812
+run 3: Execution Time: 31.12290200404823
+
+
+
+
+
+== Physical Plan ==
+AdaptiveSparkPlan (18)
++- InMemoryTableScan (1)
+      +- InMemoryRelation (2)
+            +- AdaptiveSparkPlan (17)
+               +- Project (16)
+                  +- CartesianProduct Inner (15)
+                     :- Filter (11)
+                     :  +- HashAggregate (10)
+                     :     +- Exchange (9)
+                     :        +- HashAggregate (8)
+                     :           +- Project (7)
+                     :              +- Filter (6)
+                     :                 +- Generate (5)
+                     :                    +- Filter (4)
+                     :                       +- Scan json  (3)
+                     +- Project (14)
+                        +- Filter (13)
+                           +- Scan csv  (12)
+
+
+(1) InMemoryTableScan
+Output [2]: [Zip_Code#203, per_person_income#234]
+Arguments: [Zip_Code#203, per_person_income#234]
+
+(2) InMemoryRelation
+Arguments: [Zip_Code#203, per_person_income#234], CachedRDDBuilder(org.apache.spark.sql.execution.columnar.DefaultCachedBatchSerializer@56555d62,StorageLevel(disk, memory, deserialized, 1 replicas),AdaptiveSparkPlan isFinalPlan=false
++- Project [Zip_Code#203, ((Estimated_Median_Income#209 * cast(HOUSING20#197L as double)) / cast(POP20#199L as double)) AS per_person_income#234]
+   +- CartesianProduct (ZCTA20#46 = Zip_Code#203)
+      :- Filter (isnotnull(POP20#199L) AND (POP20#199L > 0))
+      :  +- HashAggregate(keys=[ZCTA20#46], functions=[sum(HOUSING20#36L), sum(POP20#38L)], output=[ZCTA20#46, HOUSING20#197L, POP20#199L])
+      :     +- Exchange hashpartitioning(ZCTA20#46, 200), ENSURE_REQUIREMENTS, [plan_id=55]
+      :        +- HashAggregate(keys=[ZCTA20#46], functions=[partial_sum(HOUSING20#36L), partial_sum(POP20#38L)], output=[ZCTA20#46, sum#247L, sum#248L])
+      :           +- Project [features#9.properties.HOUSING20 AS HOUSING20#36L, features#9.properties.POP20 AS POP20#38L, features#9.properties.ZCTA20 AS ZCTA20#46]
+      :              +- Filter isnotnull(features#9.properties.ZCTA20)
+      :                 +- Generate explode(features#1), false, [features#9]
+      :                    +- Filter ((size(features#1, true) > 0) AND isnotnull(features#1))
+      :                       +- FileScan json [features#1] Batched: false, DataFilters: [(size(features#1, true) > 0), isnotnull(features#1)], Format: JSON, Location: InMemoryFileIndex(1 paths)[hdfs://hdfs-namenode.default.svc.cluster.local:9000/data/LA_Census_Blo..., PartitionFilters: [], PushedFilters: [IsNotNull(features)], ReadSchema: struct<features:array<struct<geometry:struct<coordinates:array<array<array<string>>>,type:string>...
+      +- Project [Zip_Code#203, cast(regexp_replace(Estimated_Median_Income#205, [$,], , 1) as double) AS Estimated_Median_Income#209]
+         +- Filter ((isnotnull(Estimated_Median_Income#205) AND isnotnull(cast(regexp_replace(Estimated_Median_Income#205, [$,], , 1) as double))) AND isnotnull(Zip_Code#203))
+            +- FileScan csv [Zip_Code#203,Estimated_Median_Income#205] Batched: false, DataFilters: [isnotnull(Estimated_Median_Income#205), isnotnull(cast(regexp_replace(Estimated_Median_Income#20..., Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://hdfs-namenode.default.svc.cluster.local:9000/data/LA_income_202..., PartitionFilters: [], PushedFilters: [IsNotNull(Estimated_Median_Income), IsNotNull(Zip_Code)], ReadSchema: struct<Zip_Code:string,Estimated_Median_Income:string>
+,None)
+
+(3) Scan json 
+Output [1]: [features#1]
+Batched: false
+Location: InMemoryFileIndex [hdfs://hdfs-namenode.default.svc.cluster.local:9000/data/LA_Census_Blocks_2020.geojson]
+PushedFilters: [IsNotNull(features)]
+ReadSchema: struct<features:array<struct<geometry:struct<coordinates:array<array<array<string>>>,type:string>,properties:struct<BG20:string,BG20FIP_CURRENT:string,BGFIP20:string,CB20:string,CITY:string,CITYCOMM:string,CITYCOMM_CURRENT:string,CITY_CURRENT:string,COMM:string,COMM_CURRENT:string,COUNTY:string,CT20:string,CTCB20:string,FEAT_TYPE:string,FIP20:string,FIP_CURRENT:string,HD22:bigint,HD_NAME:string,HOUSING20:bigint,OBJECTID:bigint,POP20:bigint,SPA22:bigint,SPA_NAME:string,SUP21:string,SUP_LABEL:string,ShapeSTArea:double,ShapeSTLength:double,State:string,ZCTA20:string>,type:string>>>
+
+(4) Filter
+Input [1]: [features#1]
+Condition : ((size(features#1, true) > 0) AND isnotnull(features#1))
+
+(5) Generate
+Input [1]: [features#1]
+Arguments: explode(features#1), false, [features#9]
+
+(6) Filter
+Input [1]: [features#9]
+Condition : isnotnull(features#9.properties.ZCTA20)
+
+(7) Project
+Output [3]: [features#9.properties.HOUSING20 AS HOUSING20#36L, features#9.properties.POP20 AS POP20#38L, features#9.properties.ZCTA20 AS ZCTA20#46]
+Input [1]: [features#9]
+
+(8) HashAggregate
+Input [3]: [HOUSING20#36L, POP20#38L, ZCTA20#46]
+Keys [1]: [ZCTA20#46]
+Functions [2]: [partial_sum(HOUSING20#36L), partial_sum(POP20#38L)]
+Aggregate Attributes [2]: [sum#245L, sum#246L]
+Results [3]: [ZCTA20#46, sum#247L, sum#248L]
+
+(9) Exchange
+Input [3]: [ZCTA20#46, sum#247L, sum#248L]
+Arguments: hashpartitioning(ZCTA20#46, 200), ENSURE_REQUIREMENTS, [plan_id=55]
+
+(10) HashAggregate
+Input [3]: [ZCTA20#46, sum#247L, sum#248L]
+Keys [1]: [ZCTA20#46]
+Functions [2]: [sum(HOUSING20#36L), sum(POP20#38L)]
+Aggregate Attributes [2]: [sum(HOUSING20#36L)#196L, sum(POP20#38L)#198L]
+Results [3]: [ZCTA20#46, sum(HOUSING20#36L)#196L AS HOUSING20#197L, sum(POP20#38L)#198L AS POP20#199L]
+
+(11) Filter
+Input [3]: [ZCTA20#46, HOUSING20#197L, POP20#199L]
+Condition : (isnotnull(POP20#199L) AND (POP20#199L > 0))
+
+(12) Scan csv 
+Output [2]: [Zip_Code#203, Estimated_Median_Income#205]
+Batched: false
+Location: InMemoryFileIndex [hdfs://hdfs-namenode.default.svc.cluster.local:9000/data/LA_income_2021.csv]
+PushedFilters: [IsNotNull(Estimated_Median_Income), IsNotNull(Zip_Code)]
+ReadSchema: struct<Zip_Code:string,Estimated_Median_Income:string>
+
+(13) Filter
+Input [2]: [Zip_Code#203, Estimated_Median_Income#205]
+Condition : ((isnotnull(Estimated_Median_Income#205) AND isnotnull(cast(regexp_replace(Estimated_Median_Income#205, [$,], , 1) as double))) AND isnotnull(Zip_Code#203))
+
+(14) Project
+Output [2]: [Zip_Code#203, cast(regexp_replace(Estimated_Median_Income#205, [$,], , 1) as double) AS Estimated_Median_Income#209]
+Input [2]: [Zip_Code#203, Estimated_Median_Income#205]
+
+(15) CartesianProduct
+Join type: Inner
+Join condition: (ZCTA20#46 = Zip_Code#203)
+
+(16) Project
+Output [2]: [Zip_Code#203, ((Estimated_Median_Income#209 * cast(HOUSING20#197L as double)) / cast(POP20#199L as double)) AS per_person_income#234]
+Input [5]: [ZCTA20#46, HOUSING20#197L, POP20#199L, Zip_Code#203, Estimated_Median_Income#209]
+
+(17) AdaptiveSparkPlan
+Output [2]: [Zip_Code#203, per_person_income#234]
+Arguments: isFinalPlan=false
+
+(18) AdaptiveSparkPlan
+Output [2]: [Zip_Code#203, per_person_income#234]
+Arguments: isFinalPlan=false

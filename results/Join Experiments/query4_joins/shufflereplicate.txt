@@ -1,0 +1,172 @@
+run 1: Execution Time: 59.499250336084515
+run 2: Execution Time: 37.56356211518869
+run 3: Execution Time: 60.11965533113107
+
+
+
+== Physical Plan ==
+AdaptiveSparkPlan (26)
++- InMemoryTableScan (1)
+      +- InMemoryRelation (2)
+            +- AdaptiveSparkPlan (25)
+               +- Sort (24)
+                  +- Exchange (23)
+                     +- HashAggregate (22)
+                        +- Exchange (21)
+                           +- HashAggregate (20)
+                              +- Project (19)
+                                 +- Filter (18)
+                                    +- Window (17)
+                                       +- WindowGroupLimit (16)
+                                          +- Sort (15)
+                                             +- Exchange (14)
+                                                +- WindowGroupLimit (13)
+                                                   +- Sort (12)
+                                                      +- Project (11)
+                                                         +- Project (10)
+                                                            +- CartesianProduct Inner (9)
+                                                               :- Project (5)
+                                                               :  +- Filter (4)
+                                                               :     +- Scan csv  (3)
+                                                               +- Project (8)
+                                                                  +- Filter (7)
+                                                                     +- Scan csv  (6)
+
+
+(1) InMemoryTableScan
+Output [3]: [DIVISION#71, average_distance#172, num_of_crimes#174L]
+Arguments: [DIVISION#71, average_distance#172, num_of_crimes#174L]
+
+(2) InMemoryRelation
+Arguments: [DIVISION#71, average_distance#172, num_of_crimes#174L], CachedRDDBuilder(org.apache.spark.sql.execution.columnar.DefaultCachedBatchSerializer@58d88a8,StorageLevel(disk, memory, deserialized, 1 replicas),AdaptiveSparkPlan isFinalPlan=false
++- Sort [num_of_crimes#174L DESC NULLS LAST], true, 0
+   +- Exchange rangepartitioning(num_of_crimes#174L DESC NULLS LAST, 200), ENSURE_REQUIREMENTS, [plan_id=72]
+      +- HashAggregate(keys=[DIVISION#71], functions=[avg(distance#136), count(1)], output=[DIVISION#71, average_distance#172, num_of_crimes#174L])
+         +- Exchange hashpartitioning(DIVISION#71, 200), ENSURE_REQUIREMENTS, [plan_id=69]
+            +- HashAggregate(keys=[DIVISION#71], functions=[partial_avg(distance#136), partial_count(1)], output=[DIVISION#71, sum#181, count#182L, count#183L])
+               +- Project [DIVISION#71, distance#136]
+                  +- Filter (row_num#156 = 1)
+                     +- Window [row_number() windowspecdefinition(DR_NO#0, distance#136 ASC NULLS FIRST, specifiedwindowframe(RowFrame, unboundedpreceding$(), currentrow$())) AS row_num#156], [DR_NO#0], [distance#136 ASC NULLS FIRST]
+                        +- WindowGroupLimit [DR_NO#0], [distance#136 ASC NULLS FIRST], row_number(), 1, Final
+                           +- Sort [DR_NO#0 ASC NULLS FIRST, distance#136 ASC NULLS FIRST], false, 0
+                              +- Exchange hashpartitioning(DR_NO#0, 200), ENSURE_REQUIREMENTS, [plan_id=61]
+                                 +- WindowGroupLimit [DR_NO#0], [distance#136 ASC NULLS FIRST], row_number(), 1, Partial
+                                    +- Sort [DR_NO#0 ASC NULLS FIRST, distance#136 ASC NULLS FIRST], false, 0
+                                       +- Project [DR_NO#0, DIVISION#71, (ASIN(SQRT((POWER(SIN(((tempLat2#125 - tempLat1#106) / 2.0)), 2.0) + ((COS(tempLat1#106) * COS(tempLat2#125)) * POWER(SIN(((tempLon2#115 - tempLon1#98) / 2.0)), 2.0))))) * 12742.0) AS distance#136]
+                                          +- Project [DR_NO#0, DIVISION#71, RADIANS(LON#64) AS tempLon1#98, RADIANS(LAT#60) AS tempLat1#106, RADIANS(X#84) AS tempLon2#115, RADIANS(Y#88) AS tempLat2#125]
+                                             +- CartesianProduct
+                                                :- Project [DR_NO#0, cast(LAT#26 as double) AS LAT#60, cast(LON#27 as double) AS LON#64]
+                                                :  +- Filter (((((isnotnull(LAT#26) AND isnotnull(LON#27)) AND isnotnull(cast(LAT#26 as double))) AND isnotnull(cast(LON#27 as double))) AND NOT (cast(LAT#26 as double) = 0.0)) AND NOT (cast(LON#27 as double) = 0.0))
+                                                :     +- FileScan csv [DR_NO#0,LAT#26,LON#27] Batched: false, DataFilters: [isnotnull(LAT#26), isnotnull(LON#27), isnotnull(cast(LAT#26 as double)), isnotnull(cast(LON#27 a..., Format: CSV, Location: InMemoryFileIndex(2 paths)[hdfs://hdfs-namenode.default.svc.cluster.local:9000/data/LA_Crime_Data..., PartitionFilters: [], PushedFilters: [IsNotNull(LAT), IsNotNull(LON)], ReadSchema: struct<DR_NO:string,LAT:string,LON:string>
+                                                +- Project [cast(X#68 as double) AS X#84, cast(Y#69 as double) AS Y#88, DIVISION#71]
+                                                   +- Filter (((isnotnull(X#68) AND isnotnull(Y#69)) AND isnotnull(cast(X#68 as double))) AND isnotnull(cast(Y#69 as double)))
+                                                      +- FileScan csv [X#68,Y#69,DIVISION#71] Batched: false, DataFilters: [isnotnull(X#68), isnotnull(Y#69), isnotnull(cast(X#68 as double)), isnotnull(cast(Y#69 as double))], Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://hdfs-namenode.default.svc.cluster.local:9000/data/LA_Police_Sta..., PartitionFilters: [], PushedFilters: [IsNotNull(X), IsNotNull(Y)], ReadSchema: struct<X:string,Y:string,DIVISION:string>
+,None), [num_of_crimes#174L DESC NULLS LAST]
+
+(3) Scan csv 
+Output [3]: [DR_NO#0, LAT#26, LON#27]
+Batched: false
+Location: InMemoryFileIndex [hdfs://hdfs-namenode.default.svc.cluster.local:9000/data/LA_Crime_Data/LA_Crime_Data_2010_2019.csv, ... 1 entries]
+PushedFilters: [IsNotNull(LAT), IsNotNull(LON)]
+ReadSchema: struct<DR_NO:string,LAT:string,LON:string>
+
+(4) Filter
+Input [3]: [DR_NO#0, LAT#26, LON#27]
+Condition : (((((isnotnull(LAT#26) AND isnotnull(LON#27)) AND isnotnull(cast(LAT#26 as double))) AND isnotnull(cast(LON#27 as double))) AND NOT (cast(LAT#26 as double) = 0.0)) AND NOT (cast(LON#27 as double) = 0.0))
+
+(5) Project
+Output [3]: [DR_NO#0, cast(LAT#26 as double) AS LAT#60, cast(LON#27 as double) AS LON#64]
+Input [3]: [DR_NO#0, LAT#26, LON#27]
+
+(6) Scan csv 
+Output [3]: [X#68, Y#69, DIVISION#71]
+Batched: false
+Location: InMemoryFileIndex [hdfs://hdfs-namenode.default.svc.cluster.local:9000/data/LA_Police_Stations.csv]
+PushedFilters: [IsNotNull(X), IsNotNull(Y)]
+ReadSchema: struct<X:string,Y:string,DIVISION:string>
+
+(7) Filter
+Input [3]: [X#68, Y#69, DIVISION#71]
+Condition : (((isnotnull(X#68) AND isnotnull(Y#69)) AND isnotnull(cast(X#68 as double))) AND isnotnull(cast(Y#69 as double)))
+
+(8) Project
+Output [3]: [cast(X#68 as double) AS X#84, cast(Y#69 as double) AS Y#88, DIVISION#71]
+Input [3]: [X#68, Y#69, DIVISION#71]
+
+(9) CartesianProduct
+Join type: Inner
+Join condition: None
+
+(10) Project
+Output [6]: [DR_NO#0, DIVISION#71, RADIANS(LON#64) AS tempLon1#98, RADIANS(LAT#60) AS tempLat1#106, RADIANS(X#84) AS tempLon2#115, RADIANS(Y#88) AS tempLat2#125]
+Input [6]: [DR_NO#0, LAT#60, LON#64, X#84, Y#88, DIVISION#71]
+
+(11) Project
+Output [3]: [DR_NO#0, DIVISION#71, (ASIN(SQRT((POWER(SIN(((tempLat2#125 - tempLat1#106) / 2.0)), 2.0) + ((COS(tempLat1#106) * COS(tempLat2#125)) * POWER(SIN(((tempLon2#115 - tempLon1#98) / 2.0)), 2.0))))) * 12742.0) AS distance#136]
+Input [6]: [DR_NO#0, DIVISION#71, tempLon1#98, tempLat1#106, tempLon2#115, tempLat2#125]
+
+(12) Sort
+Input [3]: [DR_NO#0, DIVISION#71, distance#136]
+Arguments: [DR_NO#0 ASC NULLS FIRST, distance#136 ASC NULLS FIRST], false, 0
+
+(13) WindowGroupLimit
+Input [3]: [DR_NO#0, DIVISION#71, distance#136]
+Arguments: [DR_NO#0], [distance#136 ASC NULLS FIRST], row_number(), 1, Partial
+
+(14) Exchange
+Input [3]: [DR_NO#0, DIVISION#71, distance#136]
+Arguments: hashpartitioning(DR_NO#0, 200), ENSURE_REQUIREMENTS, [plan_id=61]
+
+(15) Sort
+Input [3]: [DR_NO#0, DIVISION#71, distance#136]
+Arguments: [DR_NO#0 ASC NULLS FIRST, distance#136 ASC NULLS FIRST], false, 0
+
+(16) WindowGroupLimit
+Input [3]: [DR_NO#0, DIVISION#71, distance#136]
+Arguments: [DR_NO#0], [distance#136 ASC NULLS FIRST], row_number(), 1, Final
+
+(17) Window
+Input [3]: [DR_NO#0, DIVISION#71, distance#136]
+Arguments: [row_number() windowspecdefinition(DR_NO#0, distance#136 ASC NULLS FIRST, specifiedwindowframe(RowFrame, unboundedpreceding$(), currentrow$())) AS row_num#156], [DR_NO#0], [distance#136 ASC NULLS FIRST]
+
+(18) Filter
+Input [4]: [DR_NO#0, DIVISION#71, distance#136, row_num#156]
+Condition : (row_num#156 = 1)
+
+(19) Project
+Output [2]: [DIVISION#71, distance#136]
+Input [4]: [DR_NO#0, DIVISION#71, distance#136, row_num#156]
+
+(20) HashAggregate
+Input [2]: [DIVISION#71, distance#136]
+Keys [1]: [DIVISION#71]
+Functions [2]: [partial_avg(distance#136), partial_count(1)]
+Aggregate Attributes [3]: [sum#178, count#179L, count#180L]
+Results [4]: [DIVISION#71, sum#181, count#182L, count#183L]
+
+(21) Exchange
+Input [4]: [DIVISION#71, sum#181, count#182L, count#183L]
+Arguments: hashpartitioning(DIVISION#71, 200), ENSURE_REQUIREMENTS, [plan_id=69]
+
+(22) HashAggregate
+Input [4]: [DIVISION#71, sum#181, count#182L, count#183L]
+Keys [1]: [DIVISION#71]
+Functions [2]: [avg(distance#136), count(1)]
+Aggregate Attributes [2]: [avg(distance#136)#171, count(1)#173L]
+Results [3]: [DIVISION#71, avg(distance#136)#171 AS average_distance#172, count(1)#173L AS num_of_crimes#174L]
+
+(23) Exchange
+Input [3]: [DIVISION#71, average_distance#172, num_of_crimes#174L]
+Arguments: rangepartitioning(num_of_crimes#174L DESC NULLS LAST, 200), ENSURE_REQUIREMENTS, [plan_id=72]
+
+(24) Sort
+Input [3]: [DIVISION#71, average_distance#172, num_of_crimes#174L]
+Arguments: [num_of_crimes#174L DESC NULLS LAST], true, 0
+
+(25) AdaptiveSparkPlan
+Output [3]: [DIVISION#71, average_distance#172, num_of_crimes#174L]
+Arguments: isFinalPlan=false
+
+(26) AdaptiveSparkPlan
+Output [3]: [DIVISION#71, average_distance#172, num_of_crimes#174L]
+Arguments: isFinalPlan=false

@@ -1,0 +1,33 @@
+run 1: Execution Time: 85.623942989856
+run 2: Execution Time: 92.95228306716308
+run 3: Execution Time: 87.56210969993845
+
+
+####################################################
+
+OUTPUT
+
+
+
+
+DIVISION:HOLLYWOOD,     Average Distance:2.0735728702037606,     224124crimes 
+DIVISION:VAN NUYS,     Average Distance:2.939252669823,     208129crimes 
+DIVISION:SOUTHWEST,     Average Distance:2.1914657733002993,     189119crimes 
+DIVISION:WILSHIRE,     Average Distance:2.5932951178988284,     186383crimes 
+DIVISION:77TH STREET,     Average Distance:1.7171127601733376,     170620crimes 
+DIVISION:NORTH HOLLYWOOD,     Average Distance:2.6424958893710224,     168096crimes 
+DIVISION:OLYMPIC,     Average Distance:1.7289297394165049,     162805crimes 
+DIVISION:PACIFIC,     Average Distance:3.853492573106687,     162027crimes 
+DIVISION:CENTRAL,     Average Distance:0.9933230200575435,     154689crimes 
+DIVISION:RAMPART,     Average Distance:1.5342182645903613,     153204crimes 
+DIVISION:SOUTHEAST,     Average Distance:2.443911850083341,     143803crimes 
+DIVISION:WEST VALLEY,     Average Distance:3.021567903570024,     136622crimes 
+DIVISION:FOOTHILL,     Average Distance:4.2600944103711935,     132482crimes 
+DIVISION:TOPANGA,     Average Distance:3.2969850699064707,     131054crimes 
+DIVISION:HARBOR,     Average Distance:3.7017124144295437,     127071crimes 
+DIVISION:HOLLENBECK,     Average Distance:2.6774491240273166,     116235crimes 
+DIVISION:WEST LOS ANGELES,     Average Distance:2.789517994785112,     115969crimes 
+DIVISION:NEWTON,     Average Distance:1.635225015772534,     111392crimes 
+DIVISION:NORTHEAST,     Average Distance:3.6229822100777582,     108243crimes 
+DIVISION:MISSION,     Average Distance:3.6762211729277197,     97926crimes 
+DIVISION:DEVONSHIRE,     Average Distance:2.824647853542468,     77180crimes

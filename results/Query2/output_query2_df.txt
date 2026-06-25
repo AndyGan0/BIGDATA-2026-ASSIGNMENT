@@ -1,0 +1,57 @@
+run 1: Execution Time: 47.84847926115617
+run 2: Execution Time: 58.100849663838744
+run 3: Execution Time: 26.34523810725659
+
+
+##########################################
+
+OUTPUT
+
+2010-1: 19524 crimes - 1 ranking
+2010-3: 18131 crimes - 2 ranking
+2010-7: 17857 crimes - 3 ranking
+2011-1: 18144 crimes - 1 ranking
+2011-7: 17284 crimes - 2 ranking
+2011-10: 17035 crimes - 3 ranking
+2012-1: 17958 crimes - 1 ranking
+2012-8: 17662 crimes - 2 ranking
+2012-5: 17504 crimes - 3 ranking
+2013-8: 17442 crimes - 1 ranking
+2013-1: 16833 crimes - 2 ranking
+2013-7: 16645 crimes - 3 ranking
+2014-10: 17337 crimes - 1 ranking
+2014-7: 17260 crimes - 2 ranking
+2014-12: 17201 crimes - 3 ranking
+2015-8: 15044 crimes - 1 ranking
+2015-10: 14934 crimes - 2 ranking
+2015-7: 14852 crimes - 3 ranking
+2016-12: 26236 crimes - 1 ranking
+2016-10: 25008 crimes - 2 ranking
+2016-8: 24635 crimes - 3 ranking
+2017-10: 20442 crimes - 1 ranking
+2017-7: 20202 crimes - 2 ranking
+2017-1: 19866 crimes - 3 ranking
+2018-5: 19979 crimes - 1 ranking
+2018-7: 19882 crimes - 2 ranking
+2018-8: 19769 crimes - 3 ranking
+2019-7: 19132 crimes - 1 ranking
+2019-8: 18994 crimes - 2 ranking
+2019-3: 18877 crimes - 3 ranking
+2020-1: 18576 crimes - 1 ranking
+2020-2: 17284 crimes - 2 ranking
+2020-5: 17230 crimes - 3 ranking
+2021-10: 19343 crimes - 1 ranking
+2021-7: 18690 crimes - 2 ranking
+2021-8: 18398 crimes - 3 ranking
+2022-5: 20467 crimes - 1 ranking
+2022-10: 20335 crimes - 2 ranking
+2022-6: 20273 crimes - 3 ranking
+2023-10: 20122 crimes - 1 ranking
+2023-8: 20082 crimes - 2 ranking
+2023-1: 19970 crimes - 3 ranking
+2024-1: 18926 crimes - 1 ranking
+2024-2: 17394 crimes - 2 ranking
+2024-3: 16293 crimes - 3 ranking
+2025-2: 44 crimes - 1 ranking
+2025-1: 26 crimes - 2 ranking
+2025-3: 24 crimes - 3 ranking
